@@ -4,7 +4,7 @@
       v-model="cmpValue"
       v-bind:label="label"
       v-bind="properties"
-      v-bind:maxlength="options.length + options.precision"
+      v-bind:maxlength="maxLength"
       v-on:keypress="keyPress"
       v-on:blur="$emit('blur')"
       v-on:change="$emit('change')"
@@ -24,17 +24,17 @@ export default {
   props: {
     value: {
       type: [String, Number],
-      default: "0",
+      default: "0"
     },
     label: {
       type: String,
-      default: "",
+      default: ""
     },
     properties: {
       type: Object,
       default: function() {
         return {};
-      },
+      }
     },
     options: {
       type: Object,
@@ -44,9 +44,10 @@ export default {
           length: 11,
           precision: 2,
           empty: null,
+          allowNegative: false
         };
-      },
-    },
+      }
+    }
   },
   data: () => ({}),
   /*
@@ -54,42 +55,48 @@ export default {
    O valor digitado entra pelo newValue do Set é emitido para o componente pai, retorna pelo get e pára.
   */
   computed: {
+    allowNegative() {
+      return this.options.allowNegative;
+    },
+    precision() {
+      return this.options.precision;
+    },
     cmpValue: {
       get: function() {
         return this.humanFormat(this.value);
       },
       set: function(newValue) {
         this.$emit("input", this.machineFormat(newValue));
-      },
+      }
     },
+    maxLength() {
+      if (this.allowNegative) {
+        return this.options.length + this.precision + 1;
+      }
+
+      return this.options.length + this.precision;
+    }
   },
   watch: {},
   methods: {
     humanFormat: function(value) {
       if (value || value === 0) {
         value = Number(value).toLocaleString(this.options.locale, {
-          maximumFractionDigits: this.options.precision,
-          minimumFractionDigits: this.options.precision,
+          maximumFractionDigits: this.precision,
+          minimumFractionDigits: this.precision
         });
       } else {
         value = this.options.empty;
       }
+
       return value;
     },
-
     machineFormat(value) {
-      if (value) {
+      if (value || (this.allowNegative && Object.is(value, -0))) {
         value = this.clearNumber(value);
-        // Ajustar quantidade de zeros à esquerda
-        value = value.padStart(parseInt(this.options.precision) + 1, "0");
-        // Incluir ponto na casa correta, conforme a precisão configurada
-        value =
-          value.substring(0, value.length - parseInt(this.options.precision)) +
-          "." +
-          value.substring(
-            value.length - parseInt(this.options.precision),
-            value.length
-          );
+        value = this.fillZeros(value);
+        value = this.insertPoint(value);
+
         if (value === "") {
           value = this.options.empty;
         }
@@ -98,13 +105,41 @@ export default {
       }
       return value;
     },
+    // Ajustar quantidade de zeros à esquerda
+    fillZeros(value) {
+      let result = "";
+
+      if (
+        this.allowNegative &&
+        (value.startsWith("-") || Object.is(value, -0))
+      ) {
+        result = value.substring(1, value.length);
+        result = result.padStart(parseInt(this.precision) + 1, "0");
+        result = "-" + result;
+      } else {
+        result = value.padStart(parseInt(this.precision) + 1, "0");
+      }
+
+      return result;
+    },
+
+    // Incluir ponto na casa correta, conforme a precisão configurada
+    insertPoint(value) {
+      const length = value.length;
+      const left = value.substring(0, length - parseInt(this.precision));
+      const right = value.substring(length - parseInt(this.precision), length);
+
+      return `${left}.${right}`;
+    },
 
     // Retira todos os caracteres não numéricos e zeros à esquerda
     clearNumber: function(value) {
       let result = "";
-      if (value) {
+
+      if (value || (this.allowNegative && value === 0)) {
         let flag = false;
-        let arrayValue = value.toString().split("");
+        let arrayValue = this.valueToArray(value);
+
         for (var i = 0; i < arrayValue.length; i++) {
           if (this.isInteger(arrayValue[i])) {
             if (!flag) {
@@ -121,22 +156,42 @@ export default {
             } else {
               result = result + arrayValue[i];
             }
+            // allow negative numbers to be passed
+            // when the first char is '-'
+          } else if (this.allowNegative && i === 0 && arrayValue[0] === "-") {
+            result = result + arrayValue[i];
           }
         }
       }
+
       return result;
     },
-
+    valueToArray(value) {
+      if (this.allowNegative && Object.is(value, -0)) {
+        return ["-", "0"];
+      } else {
+        return value.toString().split("");
+      }
+    },
     keyPress($event) {
-      // console.log($event.keyCode); //keyCodes value
       let keyCode = $event.keyCode ? $event.keyCode : $event.which;
-      // if ((keyCode < 48 || keyCode > 57) && keyCode !== 46) {
+
       if (keyCode < 48 || keyCode > 57) {
-        // 46 is dot
+        // 46 is dot!
+        // 45 is minus!
+
+        if (this.allowNegative && keyCode === 45) {
+          let curVal = this.humanFormat(this.value);
+
+          if (curVal == null) {
+            this.cmpValue = -0;
+          } else if (!curVal.includes("-")) {
+            this.cmpValue = `-${curVal}`;
+          }
+        }
         $event.preventDefault();
       }
     },
-
     isInteger(value) {
       let result = false;
       if (Number.isInteger(parseInt(value))) {
@@ -144,13 +199,11 @@ export default {
       }
       return result;
     },
-
     focus() {
       setTimeout(() => {
         this.$refs.ref.focus();
       }, 500);
-    },
-    
-  },
+    }
+  }
 };
 </script>
