@@ -200,9 +200,9 @@ export default {
       return result;
     },
     focus() {
-      setTimeout(() => {
+      this.$nextTick(() => {
         this.$refs.ref.focus();
-      }, 500);
+      });
     }
   }
 };
