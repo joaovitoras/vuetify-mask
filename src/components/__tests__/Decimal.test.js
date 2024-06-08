@@ -20,7 +20,7 @@ describe("Decimal.vue", () => {
         v-model="value"
         :label="label"
         :options="options"
-        @input="$emit('input', $event)"
+        @update:modelValue="$emit('update:modelValue', $event)"
       />
     `,
     };
@@ -62,7 +62,9 @@ describe("Decimal.vue", () => {
       await fireEvent.update(input, positiveInputValue);
 
       expect(findInput(component).value).toBe(positiveInputValue);
-      expect(component.emitted().input).toEqual([[positiveEmittedValue]]);
+      expect(component.emitted("update:modelValue")).toEqual([
+        [positiveEmittedValue],
+      ]);
     });
 
     describe("when type negative value", () => {
@@ -73,7 +75,9 @@ describe("Decimal.vue", () => {
         await fireEvent.update(input, negativeInputValue);
 
         expect(findInput(component).value).toBe(positiveInputValue);
-        expect(component.emitted().input).toEqual([[positiveEmittedValue]]);
+        expect(component.emitted("update:modelValue")).toEqual([
+          [positiveEmittedValue],
+        ]);
       });
 
       describe("when type negative symbol after clean input", () => {
@@ -87,7 +91,10 @@ describe("Decimal.vue", () => {
           await fireEvent.keyPress(input, { keyCode: 45 });
 
           expect(findInput(component).value).toBe("-0,00");
-          expect(component.emitted().input).toEqual([[undefined], ["-0.00"]]);
+          expect(component.emitted("update:modelValue")).toEqual([
+            [undefined],
+            ["-0.00"],
+          ]);
         });
       });
 
@@ -100,7 +107,9 @@ describe("Decimal.vue", () => {
           await fireEvent.update(input, negativeInputValue);
 
           expect(findInput(component).value).toBe(negativeInputValue);
-          expect(component.emitted().input).toEqual([[negativeEmittedValue]]);
+          expect(component.emitted("update:modelValue")).toEqual([
+            [negativeEmittedValue],
+          ]);
         });
 
         describe("when type negative symbol with current value", () => {
@@ -115,7 +124,9 @@ describe("Decimal.vue", () => {
             await fireEvent.keyPress(input, { keyCode: 45 });
 
             expect(findInput(component).value).toBe(negativeInputValue);
-            expect(component.emitted().input).toEqual([[negativeEmittedValue]]);
+            expect(component.emitted("update:modelValue")).toEqual([
+              [negativeEmittedValue],
+            ]);
           });
         });
       });
