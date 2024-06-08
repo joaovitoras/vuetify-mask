@@ -2,9 +2,9 @@
   <div>
     <v-text-field
       v-model="cmpValue"
-      :label="label"
+      v-bind:label="label"
+      v-bind:maxlength="maxLength"
       v-bind="properties"
-      :maxlength="maxLength"
       @keypress="keyPress"
       @blur="$emit('blur')"
       @change="$emit('change')"
