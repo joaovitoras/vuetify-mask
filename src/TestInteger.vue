@@ -1,16 +1,16 @@
 <template>
   <div>
     <v-text-field-integer
-      v-model="value"
-      v-bind:label="label"
-      v-bind:properties="{
+      v-model="modelValue"
+      :label="label"
+      :properties="{
         readonly: false,
         disabled: false,
         outlined: false,
         clearable: true,
         placeholder: '',
       }"
-      v-bind:options="{
+      :options="{
         inputMask: '#########',
         outputMask: '#########',
         empty: null,
@@ -19,13 +19,13 @@
     />
     v-model:
     {{
-      value !== null && value !== ""
-        ? value
-        : value === null
-        ? "null"
-        : value === ""
-        ? "''"
-        : ""
+      modelValue !== null && modelValue !== ""
+        ? modelValue
+        : modelValue === null
+          ? "null"
+          : modelValue === ""
+            ? "''"
+            : ""
     }}
   </div>
 </template>
@@ -38,7 +38,7 @@ export default {
     "v-text-field-integer": Integer,
   },
   data: () => ({
-    value: "123456789", // 123 or "123" or "" or null
+    modelValue: "123456789", // 123 or "123" or "" or null
     label: "Integer",
   }),
 };

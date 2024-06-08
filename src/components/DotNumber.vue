@@ -2,17 +2,17 @@
   <div>
     <v-text-field
       v-model="cmpValue"
-      v-bind:label="label"
+      :label="label"
       v-bind="properties"
-      v-bind:maxlength="options.length"
-      v-on:keypress="keyPress"
-      v-on:blur="$emit('blur')"
-      v-on:change="$emit('change')"
-      v-on:click="$emit('click')"
-      v-on:focus="$emit('focus')"
-      v-on:keydown="$emit('keydown')"
-      v-on:mousedown="$emit('mousedown')"
-      v-on:mouseup="$emit('mouseup')"
+      :maxlength="options.length"
+      @keypress="keyPress"
+      @blur="$emit('blur')"
+      @change="$emit('change')"
+      @click="$emit('click')"
+      @focus="$emit('focus')"
+      @keydown="$emit('keydown')"
+      @mousedown="$emit('mousedown')"
+      @mouseup="$emit('mouseup')"
       ref="ref"
     ></v-text-field>
   </div>
@@ -20,9 +20,8 @@
 
 <script>
 export default {
-  model: { prop: "value", event: "input" },
   props: {
-    value: {
+    modelValue: {
       type: [String, Number],
       default: "0",
     },
@@ -32,13 +31,13 @@ export default {
     },
     properties: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
       },
     },
     options: {
       type: Object,
-      default: function() {
+      default: function () {
         return {
           length: 10,
           empty: "",
@@ -54,52 +53,52 @@ export default {
   */
   computed: {
     cmpValue: {
-      get: function() {
-        return this.humanFormat(this.value);
+      get: function () {
+        return this.humanFormat(this.modelValue);
       },
-      set: function(newValue) {
-        this.$emit("input", this.machineFormat(newValue));
+      set: function (newValue) {
+        this.$emit("update:modelValue", this.machineFormat(newValue));
       },
     },
   },
   watch: {},
   methods: {
-    humanFormat: function(value) {
-      if (value) {
-        value = this.formatValue(value);
+    humanFormat: function (modelValue) {
+      if (modelValue) {
+        modelValue = this.formatValue(modelValue);
       } else {
-        value = this.options.empty;
+        modelValue = this.options.empty;
       }
-      return value;
+      return modelValue;
     },
 
-    machineFormat(value) {
-      if (value) {
-        value = this.formatValue(value);
-        if (value === "") {
-          value = this.options.empty;
+    machineFormat(modelValue) {
+      if (modelValue) {
+        modelValue = this.formatValue(modelValue);
+        if (modelValue === "") {
+          modelValue = this.options.empty;
         }
         // Apply the mask only only after filling
         if (this.options.applyAfter) {
-          if (value.length !== this.options.length) {
-            value = this.options.empty;
+          if (modelValue.length !== this.options.length) {
+            modelValue = this.options.empty;
           } else {
             // Event sended after filling the mask
             this.$emit("masked");
           }
         }
       } else {
-        value = this.options.empty;
+        modelValue = this.options.empty;
       }
-      return value;
+      return modelValue;
     },
 
-    formatValue: function(value) {
-      return value;
+    formatValue: function (modelValue) {
+      return modelValue;
     },
 
     keyPress($event) {
-      // console.log($event.keyCode); //keyCodes value
+      // console.log($event.keyCode); //keyCodes modelValue
       let keyCode = $event.keyCode ? $event.keyCode : $event.which;
       if ((keyCode < 48 || keyCode > 57) && keyCode !== 46) {
         // if (keyCode < 48 || keyCode > 57) {
@@ -108,10 +107,10 @@ export default {
       }
     },
 
-    clearValue: function(value) {
+    clearValue: function (modelValue) {
       let result = "";
-      if (value) {
-        let arrayValue = value.toString().split("");
+      if (modelValue) {
+        let arrayValue = modelValue.toString().split("");
         for (var i = 0; i < arrayValue.length; i++) {
           if (this.isInteger(arrayValue[i])) {
             result = result + arrayValue[i];
@@ -121,9 +120,9 @@ export default {
       return result;
     },
 
-    isInteger(value) {
+    isInteger(modelValue) {
       let result = false;
-      if (Number.isInteger(parseInt(value))) {
+      if (Number.isInteger(parseInt(modelValue))) {
         result = true;
       }
       return result;
@@ -134,7 +133,6 @@ export default {
         this.$refs.ref.focus();
       }, 500);
     },
-    
   },
 };
 </script>

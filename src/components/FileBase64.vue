@@ -1,21 +1,14 @@
 <template>
   <div>
-    <v-dialog
-      v-model="showDialog"
-      scrollable
-      max-width="30%"
-      v-if="fileBase64"
-    >
-      <img v-bind:src="fileBase64" />
+    <v-dialog v-model="showDialog" scrollable max-width="30%" v-if="fileBase64">
+      <img :src="fileBase64" />
     </v-dialog>
     <v-text-field
       v-model="cmpValue"
-      v-bind:label="label"
+      :label="label"
       v-bind="properties"
-      v-on:click="pickFile"
-      v-on:click:append="
-        showDialog ? (showDialog = false) : (showDialog = true)
-      "
+      @click="pickFile"
+      @click:append="showDialog ? (showDialog = false) : (showDialog = true)"
       readonly
     ></v-text-field>
     <!-- accept="image/*" -->
@@ -25,17 +18,16 @@
       ref="refImage"
       type="file"
       style="display: none"
-      v-bind:accept="options.acceptFile"
-      v-on:change="onFilePicked"
+      :accept="options.acceptFile"
+      @change="onFilePicked"
     />
   </div>
 </template>
 
 <script>
 export default {
-  model: { prop: "value", event: "input" },
   props: {
-    value: {
+    modelValue: {
       type: [String],
       default: "",
     },
@@ -45,15 +37,15 @@ export default {
     },
     properties: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
       },
     },
     options: {
       type: Object,
-      default: function() {
+      default: function () {
         return {
-          acceptFile:"image/*,application/pdf",
+          acceptFile: "image/*,application/pdf",
         };
       },
     },
@@ -68,16 +60,16 @@ export default {
 
   computed: {
     cmpValue: {
-      get: function() {
-        this.setImage(this.value);
+      get: function () {
+        this.setImage(this.modelValue);
         return this.imageName;
       },
     },
   },
 
   methods: {
-    setImage(value) {
-      this.fileBase64 = value;
+    setImage(modelValue) {
+      this.fileBase64 = modelValue;
     },
     pickFile() {
       this.$refs.refImage.click();
@@ -94,7 +86,7 @@ export default {
         fileReader.addEventListener("load", () => {
           this.fileBase64 = fileReader.result;
           this.imageFile = files[0];
-          this.$emit("input", this.fileBase64);
+          this.$emit("update:modelValue", this.fileBase64);
           this.$emit("fileName", this.imageName);
         });
       } else {

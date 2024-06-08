@@ -1,31 +1,31 @@
 <template>
   <div>
     <v-text-field-yearmonthdayday
-      v-model="value"
-      v-bind:label="label"
-      v-bind:placeholder= "placeholder"
-      v-bind:properties="{
+      v-model="modelValue"
+      :label="label"
+      :placeholder="placeholder"
+      :properties="{
         prefix: '',
         suffix: '',
         readonly: false,
         disabled: false,
         outlined: true,
         clearable: false,
-        persistentPlaceholder:true,
+        persistentPlaceholder: true,
       }"
-      v-bind:options="{
+      :options="{
         empty: '',
       }"
     />
     v-model:
     {{
-      value !== null && value !== ""
-        ? value
-        : value === null
-        ? "null"
-        : value === ""
-        ? "''"
-        : ""
+      modelValue !== null && modelValue !== ""
+        ? modelValue
+        : modelValue === null
+          ? "null"
+          : modelValue === ""
+            ? "''"
+            : ""
     }}
   </div>
 </template>
@@ -38,7 +38,7 @@ export default {
     "v-text-field-yearmonthdayday": YearMonthDayDay,
   },
   data: () => ({
-    value: "",
+    modelValue: "",
     label: "Ano;Mes;DiaInicial;DiaFinal;",
     placeholder: "AAAA;MM;DD;DD;",
   }),

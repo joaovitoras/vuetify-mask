@@ -2,17 +2,17 @@
   <div>
     <v-text-field
       v-model="cmpValue"
-      v-bind:label="label"
+      :label="label"
       v-bind="properties"
-      v-bind:maxlength="options.length + options.precision"
-      v-on:keypress="keyPress"
-      v-on:blur="$emit('blur')"
-      v-on:change="$emit('change')"
-      v-on:click="$emit('click')"
-      v-on:focus="$emit('focus')"
-      v-on:keydown="$emit('keydown')"
-      v-on:mousedown="$emit('mousedown')"
-      v-on:mouseup="$emit('mouseup')"
+      :maxlength="options.length + options.precision"
+      @keypress="keyPress"
+      @blur="$emit('blur')"
+      @change="$emit('change')"
+      @click="$emit('click')"
+      @focus="$emit('focus')"
+      @keydown="$emit('keydown')"
+      @mousedown="$emit('mousedown')"
+      @mouseup="$emit('mouseup')"
       ref="ref"
     ></v-text-field>
   </div>
@@ -20,9 +20,8 @@
 
 <script>
 export default {
-  model: { prop: "value", event: "input" },
   props: {
-    value: {
+    modelValue: {
       type: [String, Number],
       default: "0",
     },
@@ -36,13 +35,13 @@ export default {
     },
     properties: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
       },
     },
     options: {
       type: Object,
-      default: function() {
+      default: function () {
         return {
           locale: "pt-BR",
           length: 11,
@@ -61,21 +60,21 @@ export default {
   */
   computed: {
     cmpValue: {
-      get: function() {
-        return this.humanFormat(this.value);
+      get: function () {
+        return this.humanFormat(this.modelValue);
       },
-      set: function(newValue) {
-        this.$emit("input", this.machineFormat(newValue));
+      set: function (newValue) {
+        this.$emit("update:modelValue", this.machineFormat(newValue));
       },
     },
   },
   watch: {},
   methods: {
-    humanFormat: function(value) {
-      if (value || value === 0) {
-        if (value < 0) {
-          value = value * -1;
-          this.$emit("input", value);
+    humanFormat: function (modelValue) {
+      if (modelValue || modelValue === 0) {
+        if (modelValue < 0) {
+          modelValue = modelValue * -1;
+          this.$emit("update:modelValue", modelValue);
           this.$emit("signal", "-");
           this.block = true;
         } else {
@@ -84,41 +83,50 @@ export default {
           }
           this.block = false;
         }
-        value = Number(value).toLocaleString(this.options.locale, {
+        modelValue = Number(modelValue).toLocaleString(this.options.locale, {
           maximumFractionDigits: this.options.precision,
           minimumFractionDigits: this.options.precision,
         });
       } else {
-        value = this.options.empty;
+        modelValue = this.options.empty;
       }
-      return value;
+      return modelValue;
     },
 
-    machineFormat(value) {
-      if (value) {
-        value = this.clearNumber(value);
+    machineFormat(modelValue) {
+      if (modelValue) {
+        modelValue = this.clearNumber(modelValue);
         // Ajustar quantidade de zeros à esquerda
-        value = value.padStart(parseInt(this.options.precision) + 1, "0");
+        modelValue = modelValue.padStart(
+          parseInt(this.options.precision) + 1,
+          "0",
+        );
         // Incluir ponto na casa correta, conforme a precisão configurada
-        value =
-          value.substring(0, value.length - parseInt(this.options.precision)) +
+        modelValue =
+          modelValue.substring(
+            0,
+            modelValue.length - parseInt(this.options.precision),
+          ) +
           "." +
-          value.substring(value.length - parseInt(this.options.precision), value.length);
-        if (value === "") {
-          value = this.options.empty;
+          modelValue.substring(
+            modelValue.length - parseInt(this.options.precision),
+            modelValue.length,
+          );
+        if (modelValue === "") {
+          modelValue = this.options.empty;
         }
       } else {
-        value = this.options.empty;
+        modelValue = this.options.empty;
       }
-      return value;
+      return modelValue;
     },
 
     // Retira todos os caracteres não numéricos e zeros à esquerda
-    clearNumber: function(value) {
+    clearNumber: function (modelValue) {
       let result = "";
-      if (value) {
+      if (modelValue) {
         let flag = false;
-        let arrayValue = value.toString().split("");
+        let arrayValue = modelValue.toString().split("");
         for (var i = 0; i < arrayValue.length; i++) {
           if (this.isInteger(arrayValue[i])) {
             if (!flag) {
@@ -128,7 +136,7 @@ export default {
                 flag = true;
               } else {
                 // Permitir zero quando valor igual a zero - Tipo 3 (Money or Percent)
-                if (Number(value) === 0) {
+                if (Number(modelValue) === 0) {
                   result = result + arrayValue[i];
                 }
               }
@@ -142,7 +150,7 @@ export default {
     },
 
     keyPress($event) {
-      // console.log($event.keyCode); //keyCodes value
+      // console.log($event.keyCode); //keyCodes modelValue
       let keyCode = $event.keyCode ? $event.keyCode : $event.which;
       // Positive key
       if (keyCode === 43) {
@@ -159,9 +167,9 @@ export default {
       }
     },
 
-    isInteger(value) {
+    isInteger(modelValue) {
       let result = false;
-      if (Number.isInteger(parseInt(value))) {
+      if (Number.isInteger(parseInt(modelValue))) {
         result = true;
       }
       return result;

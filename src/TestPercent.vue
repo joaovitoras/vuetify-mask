@@ -1,51 +1,49 @@
 <template>
   <div>
     <v-text-field-percent
-      v-model="value"
-      v-bind:label="label"
-      v-bind:properties="{
+      v-model="modelValue"
+      :label="label"
+      :properties="{
         suffix: '%',
         readonly: false,
         disabled: disabled,
         outlined: false,
         clearable: true,
-        placeholder: ''
+        placeholder: '',
       }"
-      v-bind:options="{
+      :options="{
         locale: 'pt-BR',
         length: 3,
         precision: 2,
         empty: null,
-        allowNegative
+        allowNegative,
       }"
     />
     v-model:
     {{
-      value !== null && value !== ""
-        ? value
-        : value === null
-        ? "null"
-        : value === ""
-        ? "''"
-        : ""
+      modelValue !== null && modelValue !== ""
+        ? modelValue
+        : modelValue === null
+          ? "null"
+          : modelValue === ""
+            ? "''"
+            : ""
     }}
 
     <br />
 
     <v-btn
-      v-on:click="disabled = !disabled"
-      x-small
+      @click="disabled = !disabled"
+      size="x-small"
       class="mr-1"
-      depressed
-      outlined
+      variant="outlined"
       >{{ disabled ? "Enabled" : "Disabled" }}</v-btn
     >
     <v-btn
-      v-on:click="allowNegative = !allowNegative"
-      x-small
+      @click="allowNegative = !allowNegative"
+      size="x-small"
       class="mr-1"
-      depressed
-      outlined
+      variant="outlined"
     >
       {{ allowNegative ? "Disallow negative" : "Allow negative" }}
     </v-btn>
@@ -57,13 +55,13 @@ import Money from "@/components/Decimal.vue";
 
 export default {
   components: {
-    "v-text-field-percent": Money
+    "v-text-field-percent": Money,
   },
   data: () => ({
-    value: "34.20", // 1.23 or "1.23" or "" or null
+    modelValue: "34.20", // 1.23 or "1.23" or "" or null
     label: "Percent",
     disabled: false,
-    allowNegative: false
-  })
+    allowNegative: false,
+  }),
 };
 </script>

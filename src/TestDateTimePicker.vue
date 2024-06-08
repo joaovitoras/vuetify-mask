@@ -5,14 +5,14 @@
         <v-text-field-datetimepicker
           v-model="value1"
           label="Data Hora"
-          v-bind:properties="{
+          :properties="{
             backgroundColor: '#EEE9E9',
             clearable: false,
             outlined: true,
             prependIcon: 'mdi-calendar',
-            appendIcon: 'mdi-av-timer'
+            appendIcon: 'mdi-av-timer',
           }"
-          v-bind:options="{
+          :options="{
             tabDateTitle: 'Data',
             tabTimeTitle: 'Hora',
             tabBackgroundColor: 'green',
@@ -28,14 +28,14 @@
         <v-text-field-datetimepicker
           v-model="value2"
           label="Date Time Picker"
-          v-bind:properties="{
+          :properties="{
             backgroundColor: '#EEE9E9',
             clearable: false,
             outlined: false,
             prependIcon: 'mdi-calendar',
-            appendIcon: ''
+            appendIcon: '',
           }"
-          v-bind:options="{
+          :options="{
             tabDateTitle: 'Date',
             tabTimeTitle: 'Time',
             tabBackgroundColor: 'blue',
@@ -51,14 +51,14 @@
         <v-text-field-datetimepicker
           v-model="value3"
           label="Date Time Picker"
-          v-bind:properties="{
+          :properties="{
             backgroundColor: '',
             clearable: false,
             outlined: false,
             prependIcon: '',
-            appendIcon: ''
+            appendIcon: '',
           }"
-          v-bind:options="{
+          :options="{
             tabDateTitle: 'Date',
             tabTimeTitle: 'Time',
             tabBackgroundColor: 'red',
@@ -78,7 +78,7 @@
 import DateTimePicker from "@/components/DateTimePicker.vue";
 
 export default {
-  name: "app",
+  name: "App",
   components: {
     "v-text-field-datetimepicker": DateTimePicker,
   },

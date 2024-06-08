@@ -1,9 +1,9 @@
 <template>
   <div>
     <v-text-field-simplemask
-      v-model="value"
-      v-bind:label="label"
-      v-bind:properties="{
+      v-model="modelValue"
+      :label="label"
+      :properties="{
         prefix: '',
         suffix: '',
         readonly: false,
@@ -12,7 +12,7 @@
         clearable: true,
         placeholder: '',
       }"
-      v-bind:options="{
+      :options="{
         inputMask: '##-####-####-###',
         outputMask: '##-####-####-###',
         empty: null,
@@ -23,13 +23,13 @@
     />
     v-model:
     {{
-      value !== null && value !== ""
-        ? value
-        : value === null
-        ? "null"
-        : value === ""
-        ? "''"
-        : ""
+      modelValue !== null && modelValue !== ""
+        ? modelValue
+        : modelValue === null
+          ? "null"
+          : modelValue === ""
+            ? "''"
+            : ""
     }}
   </div>
 </template>
@@ -42,7 +42,7 @@ export default {
     "v-text-field-simplemask": SimpleMask,
   },
   data: () => ({
-    value: "23-A568-B953-356", // 1.23 or "1.23" or "" or null
+    modelValue: "23-A568-B953-356", // 1.23 or "1.23" or "" or null
     label: "Simple Mask",
   }),
 };
