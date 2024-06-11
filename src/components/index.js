@@ -10,17 +10,17 @@ import FileBase64 from "./FileBase64.vue";
 import DotNumber from "./DotNumber.vue";
 
 function install(Vue) {
-  Vue.component("v-text-field-money", Decimal);
-  Vue.component("v-text-field-percent", Decimal);
-  Vue.component("v-text-field-integer", Integer);
-  Vue.component("v-text-field-datetime", DateTime);
-  Vue.component("v-text-field-datetimepicker", DateTimePicker);
-  Vue.component("v-text-field-simplemask", SimpleMask);
-  Vue.component("v-text-field-cpf", Cpf);
-  Vue.component("v-text-field-cnpj", Cnpj);
-  Vue.component("v-text-field-cep", Cep);
-  Vue.component("v-text-field-filebase64", FileBase64);
-  Vue.component("v-text-field-dotnumber", DotNumber);
+  Vue.component("VTextFieldMoney", Decimal);
+  Vue.component("VTextFieldPercent", Decimal);
+  Vue.component("VTextFieldInteger", Integer);
+  Vue.component("VTextFieldDatetime", DateTime);
+  Vue.component("VTextFieldDatetimepicker", DateTimePicker);
+  Vue.component("VTextFieldSimplemask", SimpleMask);
+  Vue.component("VTextFieldCpf", Cpf);
+  Vue.component("VTextFieldCnpj", Cnpj);
+  Vue.component("VTextFieldCep", Cep);
+  Vue.component("VTextFieldFilebase64", FileBase64);
+  Vue.component("VTextFieldDotnumber", DotNumber);
 }
 
 export default install;

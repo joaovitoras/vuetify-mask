@@ -2,19 +2,21 @@
   <div>
     <v-text-field
       v-model="cmpValue"
-      v-bind:label="label"
+      :label="label"
       v-bind="properties"
-      v-bind:maxlength="inputMask.length"
-      v-bind:append-icon="options.applyAfter && value ? 'mdi-check-circle' : ''"
-      v-bind:success="options.applyAfter && value ? true : false"
-      v-on:keypress="keyPress"
-      v-on:blur="$emit('blur')"
-      v-on:change="$emit('change')"
-      v-on:click="$emit('click')"
-      v-on:focus="$emit('focus')"
-      v-on:keydown="$emit('keydown')"
-      v-on:mousedown="$emit('mousedown')"
-      v-on:mouseup="$emit('mouseup')"
+      :maxlength="inputMask.length"
+      :append-inner-icon="
+        options.applyAfter && modelValue ? 'mdi-check-circle' : ''
+      "
+      :success="options.applyAfter && modelValue ? true : false"
+      @keypress="keyPress"
+      @blur="$emit('blur')"
+      @change="$emit('change')"
+      @click="$emit('click')"
+      @focus="$emit('focus')"
+      @keydown="$emit('keydown')"
+      @mousedown="$emit('mousedown')"
+      @mouseup="$emit('mouseup')"
       ref="ref"
     ></v-text-field>
   </div>
@@ -22,9 +24,8 @@
 
 <script>
 export default {
-  model: { prop: "value", event: "input" },
   props: {
-    value: {
+    modelValue: {
       type: [String, Number],
       default: "0",
     },
@@ -34,13 +35,13 @@ export default {
     },
     properties: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
       },
     },
     options: {
       type: Object,
-      default: function() {
+      default: function () {
         return {
           outputMask: "###########",
           empty: "",
@@ -58,38 +59,38 @@ export default {
   */
   computed: {
     cmpValue: {
-      get: function() {
-        return this.humanFormat(this.value);
+      get: function () {
+        return this.humanFormat(this.modelValue);
       },
-      set: function(newValue) {
-        this.$emit("input", this.machineFormat(newValue));
+      set: function (newValue) {
+        this.$emit("update:modelValue", this.machineFormat(newValue));
       },
     },
   },
   watch: {},
   methods: {
-    humanFormat: function(value) {
-      if (value) {
-        value = this.formatValue(value, this.inputMask);
+    humanFormat: function (modelValue) {
+      if (modelValue) {
+        modelValue = this.formatValue(modelValue, this.inputMask);
       } else {
-        value = this.options.empty;
+        modelValue = this.options.empty;
       }
-      return value;
+      return modelValue;
     },
 
-    machineFormat(value) {
-      if (value) {
-        value = this.formatValue(value, this.options.outputMask);
-        if (value === "") {
-          value = this.options.empty;
+    machineFormat(modelValue) {
+      if (modelValue) {
+        modelValue = this.formatValue(modelValue, this.options.outputMask);
+        if (modelValue === "") {
+          modelValue = this.options.empty;
         }
         // Apply the mask only only after filling
         if (this.options.applyAfter) {
-          if (value.length !== this.options.outputMask.length) {
-            value = this.options.empty;
+          if (modelValue.length !== this.options.outputMask.length) {
+            modelValue = this.options.empty;
           } else {
-            if (!this.validateCpf(value)) {
-              value = this.options.empty;
+            if (!this.validateCpf(modelValue)) {
+              modelValue = this.options.empty;
             } else {
               // Event sended after filling the mask
               this.$emit("masked");
@@ -97,21 +98,21 @@ export default {
           }
         }
       } else {
-        value = this.options.empty;
+        modelValue = this.options.empty;
       }
-      return value;
+      return modelValue;
     },
 
-    formatValue: function(value, mask) {
-      return this.formatCpf(value, mask);
+    formatValue: function (modelValue, mask) {
+      return this.formatCpf(modelValue, mask);
     },
 
-    formatCpf: function(value, mask) {
-      value = this.clearValue(value);
+    formatCpf: function (modelValue, mask) {
+      modelValue = this.clearValue(modelValue);
       let result = "";
       let count = 0;
-      if (value) {
-        let arrayValue = value.toString().split("");
+      if (modelValue) {
+        let arrayValue = modelValue.toString().split("");
         let arrayMask = mask.toString().split("");
         for (var i = 0; i < arrayMask.length; i++) {
           if (i < arrayValue.length + count) {
@@ -128,7 +129,7 @@ export default {
     },
 
     keyPress($event) {
-      // console.log($event.keyCode); //keyCodes value
+      // console.log($event.keyCode); //keyCodes modelValue
       let keyCode = $event.keyCode ? $event.keyCode : $event.which;
       // if ((keyCode < 48 || keyCode > 57) && keyCode !== 46) {
       if (keyCode < 48 || keyCode > 57) {
@@ -137,10 +138,10 @@ export default {
       }
     },
 
-    clearValue: function(value) {
+    clearValue: function (modelValue) {
       let result = "";
-      if (value) {
-        let arrayValue = value.toString().split("");
+      if (modelValue) {
+        let arrayValue = modelValue.toString().split("");
         for (var i = 0; i < arrayValue.length; i++) {
           if (this.isInteger(arrayValue[i])) {
             result = result + arrayValue[i];
@@ -150,9 +151,9 @@ export default {
       return result;
     },
 
-    isInteger(value) {
+    isInteger(modelValue) {
       let result = false;
-      if (Number.isInteger(parseInt(value))) {
+      if (Number.isInteger(parseInt(modelValue))) {
         result = true;
       }
       return result;
@@ -164,7 +165,7 @@ export default {
       }, 500);
     },
 
-    validateCpf: function(cpf) {
+    validateCpf: function (cpf) {
       cpf = cpf.replace(/[^\d]+/g, "");
       if (cpf == "") return false;
       // Eliminar CPFs invalidos conhecidos

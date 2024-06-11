@@ -3,16 +3,16 @@
     <v-text-field
       v-model="cmpValue"
       v-bind:label="label"
-      v-bind="properties"
       v-bind:maxlength="maxLength"
-      v-on:keypress="keyPress"
-      v-on:blur="$emit('blur')"
-      v-on:change="$emit('change')"
-      v-on:click="$emit('click')"
-      v-on:focus="$emit('focus')"
-      v-on:keydown="$emit('keydown')"
-      v-on:mousedown="$emit('mousedown')"
-      v-on:mouseup="$emit('mouseup')"
+      v-bind="properties"
+      @keypress="keyPress"
+      @blur="$emit('blur')"
+      @change="$emit('change')"
+      @click="$emit('click')"
+      @focus="$emit('focus')"
+      @keydown="$emit('keydown')"
+      @mousedown="$emit('mousedown')"
+      @mouseup="$emit('mouseup')"
       ref="ref"
     ></v-text-field>
   </div>
@@ -20,34 +20,33 @@
 
 <script>
 export default {
-  model: { prop: "value", event: "input" },
   props: {
-    value: {
+    modelValue: {
       type: [String, Number],
-      default: "0"
+      default: "0",
     },
     label: {
       type: String,
-      default: ""
+      default: "",
     },
     properties: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
-      }
+      },
     },
     options: {
       type: Object,
-      default: function() {
+      default: function () {
         return {
           locale: "pt-BR",
           length: 11,
           precision: 2,
           empty: null,
-          allowNegative: false
+          allowNegative: false,
         };
-      }
-    }
+      },
+    },
   },
   data: () => ({}),
   /*
@@ -62,12 +61,12 @@ export default {
       return this.options.precision;
     },
     cmpValue: {
-      get: function() {
-        return this.humanFormat(this.value);
+      get: function () {
+        return this.humanFormat(this.modelValue);
       },
-      set: function(newValue) {
-        this.$emit("input", this.machineFormat(newValue));
-      }
+      set: function (newValue) {
+        this.$emit("update:modelValue", this.machineFormat(newValue));
+      },
     },
     maxLength() {
       if (this.allowNegative) {
@@ -75,70 +74,73 @@ export default {
       }
 
       return this.options.length + this.precision;
-    }
+    },
   },
   watch: {},
   methods: {
-    humanFormat: function(value) {
-      if (value || value === 0) {
-        value = Number(value).toLocaleString(this.options.locale, {
+    humanFormat: function (modelValue) {
+      if (modelValue || modelValue === 0) {
+        modelValue = Number(modelValue).toLocaleString(this.options.locale, {
           maximumFractionDigits: this.precision,
-          minimumFractionDigits: this.precision
+          minimumFractionDigits: this.precision,
         });
       } else {
-        value = this.options.empty;
+        modelValue = this.options.empty;
       }
 
-      return value;
+      return modelValue;
     },
-    machineFormat(value) {
-      if (value || (this.allowNegative && Object.is(value, -0))) {
-        value = this.clearNumber(value);
-        value = this.fillZeros(value);
-        value = this.insertPoint(value);
+    machineFormat(modelValue) {
+      if (modelValue || (this.allowNegative && Object.is(modelValue, -0))) {
+        modelValue = this.clearNumber(modelValue);
+        modelValue = this.fillZeros(modelValue);
+        modelValue = this.insertPoint(modelValue);
 
-        if (value === "") {
-          value = this.options.empty;
+        if (modelValue === "") {
+          modelValue = this.options.empty;
         }
       } else {
-        value = this.options.empty;
+        modelValue = this.options.empty;
       }
-      return value;
+      return modelValue;
     },
     // Ajustar quantidade de zeros à esquerda
-    fillZeros(value) {
+    fillZeros(modelValue) {
       let result = "";
 
       if (
         this.allowNegative &&
-        (value.startsWith("-") || Object.is(value, -0))
+        (modelValue.startsWith("-") || Object.is(modelValue, -0))
       ) {
-        result = value.substring(1, value.length);
+        result = modelValue.substring(1, modelValue.length);
         result = result.padStart(parseInt(this.precision) + 1, "0");
         result = "-" + result;
       } else {
-        result = value.padStart(parseInt(this.precision) + 1, "0");
+        result = modelValue.padStart(parseInt(this.precision) + 1, "0");
       }
 
       return result;
     },
 
     // Incluir ponto na casa correta, conforme a precisão configurada
-    insertPoint(value) {
-      const length = value.length;
-      const left = value.substring(0, length - parseInt(this.precision));
-      const right = value.substring(length - parseInt(this.precision), length);
+    insertPoint(modelValue) {
+      const length = modelValue.length;
+      const left = modelValue.substring(0, length - parseInt(this.precision));
+      const right = modelValue.substring(
+        length - parseInt(this.precision),
+        length,
+      );
 
       return `${left}.${right}`;
     },
 
     // Retira todos os caracteres não numéricos e zeros à esquerda
-    clearNumber: function(value) {
+    clearNumber: function (modelValue) {
       let result = "";
 
-      if (value || (this.allowNegative && value === 0)) {
+      if (modelValue || (this.allowNegative && modelValue === 0)) {
         let flag = false;
-        let arrayValue = this.valueToArray(value);
+        let arrayValue = this.valueToArray(modelValue);
 
         for (var i = 0; i < arrayValue.length; i++) {
           if (this.isInteger(arrayValue[i])) {
@@ -149,7 +151,7 @@ export default {
                 flag = true;
               } else {
                 // Permitir zero quando valor igual a zero - Tipo 3 (Money or Percent)
-                if (Number(value) === 0) {
+                if (Number(modelValue) === 0) {
                   result = result + arrayValue[i];
                 }
               }
@@ -166,11 +168,11 @@ export default {
 
       return result;
     },
-    valueToArray(value) {
-      if (this.allowNegative && Object.is(value, -0)) {
+    valueToArray(modelValue) {
+      if (this.allowNegative && Object.is(modelValue, -0)) {
         return ["-", "0"];
       } else {
-        return value.toString().split("");
+        return modelValue.toString().split("");
       }
     },
     keyPress($event) {
@@ -181,7 +183,7 @@ export default {
         // 45 is minus!
 
         if (this.allowNegative && keyCode === 45) {
-          let curVal = this.humanFormat(this.value);
+          let curVal = this.humanFormat(this.modelValue);
 
           if (curVal == null) {
             this.cmpValue = -0;
@@ -192,9 +194,9 @@ export default {
         $event.preventDefault();
       }
     },
-    isInteger(value) {
+    isInteger(modelValue) {
       let result = false;
-      if (Number.isInteger(parseInt(value))) {
+      if (Number.isInteger(parseInt(modelValue))) {
         result = true;
       }
       return result;
@@ -203,7 +205,7 @@ export default {
       this.$nextTick(() => {
         this.$refs.ref.focus();
       });
-    }
-  }
+    },
+  },
 };
 </script>

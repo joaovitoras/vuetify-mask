@@ -1,11 +1,19 @@
-import Vue from "vue";
-import Vuetify from "vuetify";
-import "vuetify/dist/vuetify.min.css";
+/**
+ * plugins/vuetify.js
+ *
+ * Framework documentation: https://vuetifyjs.com`
+ */
+
+// Styles
 import "@mdi/font/css/materialdesignicons.css";
+import "vuetify/styles";
 
-const opts = {
-  icons: { iconfont: "mdi" }
-};
-Vue.use(Vuetify);
+// Composables
+import { createVuetify } from "vuetify";
 
-export default new Vuetify(opts);
+// https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
+export default createVuetify({
+  theme: {
+    defaultTheme: "dark",
+  },
+});

@@ -2,19 +2,19 @@
   <div>
     <v-text-field
       v-model="cmpValue"
-      v-bind:label="label"
+      :label="label"
       v-bind="properties"
-      v-bind:maxlength="options.inputMask.length"
-      v-bind:append-icon="(value) ? 'mdi-check-circle' : ''"
-      v-bind:success="(value) ? true : false"
-      v-on:keypress="keyPress"
-      v-on:blur="$emit('blur')"
-      v-on:change="$emit('change')"
-      v-on:click="$emit('click')"
-      v-on:focus="$emit('focus')"
-      v-on:keydown="$emit('keydown')"
-      v-on:mousedown="$emit('mousedown')"
-      v-on:mouseup="$emit('mouseup')"
+      :maxlength="options.inputMask.length"
+      :append-inner-icon="modelValue ? 'mdi-check-circle' : ''"
+      :success="modelValue ? true : false"
+      @keypress="keyPress"
+      @blur="$emit('blur')"
+      @change="$emit('change')"
+      @click="$emit('click')"
+      @focus="$emit('focus')"
+      @keydown="$emit('keydown')"
+      @mousedown="$emit('mousedown')"
+      @mouseup="$emit('mouseup')"
       ref="ref"
     ></v-text-field>
   </div>
@@ -24,9 +24,8 @@
 import moment from "moment";
 
 export default {
-  model: { prop: "value", event: "input" },
   props: {
-    value: {
+    modelValue: {
       type: [String, Number],
       default: "0",
     },
@@ -36,13 +35,13 @@ export default {
     },
     properties: {
       type: Object,
-      default: function() {
+      default: function () {
         return {};
       },
     },
     options: {
       type: Object,
-      default: function() {
+      default: function () {
         return {
           inputMask: "YYYY-MM-DD HH:mm:ss",
           empty: "",
@@ -57,44 +56,43 @@ export default {
   */
   computed: {
     cmpValue: {
-      get: function() {
-        return this.humanFormat(this.value);
+      get: function () {
+        return this.humanFormat(this.modelValue);
       },
-      set: function(newValue) {
-        this.$emit("input", this.machineFormat(newValue));
+      set: function (newValue) {
+        this.$emit("update:modelValue", this.machineFormat(newValue));
       },
     },
   },
-  watch: {
-  },
+  watch: {},
   methods: {
-    humanFormat: function(value) {
-      if (value) {
-        value = moment(this.toDate(this.toInteger(value))).format(
-          this.options.inputMask
+    humanFormat: function (modelValue) {
+      if (modelValue) {
+        modelValue = moment(this.toDate(this.toInteger(modelValue))).format(
+          this.options.inputMask,
         );
       } else {
-        value = this.options.empty;
+        modelValue = this.options.empty;
       }
-      return value;
+      return modelValue;
     },
 
-    machineFormat(value) {
-      if (value) {
-        value = this.formatValue(value, this.options.inputMask);
-        if (value === "") {
-          value = this.options.empty;
+    machineFormat(modelValue) {
+      if (modelValue) {
+        modelValue = this.formatValue(modelValue, this.options.inputMask);
+        if (modelValue === "") {
+          modelValue = this.options.empty;
         } else {
           // Apply the mask only only after filling
-          if (value.length !== this.options.inputMask.length) {
-            value = this.options.empty;
+          if (modelValue.length !== this.options.inputMask.length) {
+            modelValue = this.options.empty;
           } else {
-            let stringDate = moment(value, this.options.inputMask).format(
-              "YYYY-MM-DD HH:mm:ss"
+            let stringDate = moment(modelValue, this.options.inputMask).format(
+              "YYYY-MM-DD HH:mm:ss",
             );
-            value = this.toMillisecond(stringDate);
-            if (!value) {
-              value = this.options.empty;
+            modelValue = this.toMillisecond(stringDate);
+            if (!modelValue) {
+              modelValue = this.options.empty;
             } else {
               // Event sended after filling the mask
               this.$emit("masked");
@@ -102,21 +100,21 @@ export default {
           }
         }
       } else {
-        value = this.options.empty;
+        modelValue = this.options.empty;
       }
-      return value;
+      return modelValue;
     },
 
-    formatValue: function(value, mask) {
-      return this.formatDate(value, mask);
+    formatValue: function (modelValue, mask) {
+      return this.formatDate(modelValue, mask);
     },
 
-    formatDate: function(value, mask) {
-      value = this.clearValue(value);
+    formatDate: function (modelValue, mask) {
+      modelValue = this.clearValue(modelValue);
       let result = "";
       let count = 0;
-      if (value) {
-        let arrayValue = value.toString().split("");
+      if (modelValue) {
+        let arrayValue = modelValue.toString().split("");
         let arrayMask = mask.toString().split("");
         for (var i = 0; i < arrayMask.length; i++) {
           if (i < arrayValue.length + count) {
@@ -140,7 +138,7 @@ export default {
     },
 
     keyPress($event) {
-      // console.log($event.keyCode); //keyCodes value
+      // console.log($event.keyCode); //keyCodes modelValue
       let keyCode = $event.keyCode ? $event.keyCode : $event.which;
       // if ((keyCode < 48 || keyCode > 57) && keyCode !== 46) {
       if (keyCode < 48 || keyCode > 57) {
@@ -149,10 +147,10 @@ export default {
       }
     },
 
-    clearValue: function(value) {
+    clearValue: function (modelValue) {
       let result = "";
-      if (value) {
-        let arrayValue = value.toString().split("");
+      if (modelValue) {
+        let arrayValue = modelValue.toString().split("");
         for (var i = 0; i < arrayValue.length; i++) {
           if (this.isInteger(arrayValue[i])) {
             result = result + arrayValue[i];
@@ -162,26 +160,26 @@ export default {
       return result;
     },
 
-    isInteger(value) {
+    isInteger(modelValue) {
       let result = false;
-      if (Number.isInteger(parseInt(value))) {
+      if (Number.isInteger(parseInt(modelValue))) {
         result = true;
       }
       return result;
     },
 
-    toInteger(value) {
-      return Number.parseInt(value);
+    toInteger(modelValue) {
+      return Number.parseInt(modelValue);
     },
 
     /* String Date to Milliseconds */
-    toMillisecond: function(value) {
-      return Date.parse(value);
+    toMillisecond: function (modelValue) {
+      return Date.parse(modelValue);
     },
 
     /* Milliseconds to Date*/
-    toDate: function(value) {
-      return new Date(value); // Return String
+    toDate: function (modelValue) {
+      return new Date(modelValue); // Return String
     },
 
     focus() {
@@ -189,7 +187,6 @@ export default {
         this.$refs.ref.focus();
       }, 500);
     },
-
   },
 };
 </script>

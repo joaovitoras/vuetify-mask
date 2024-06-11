@@ -1,20 +1,18 @@
 import { render, fireEvent } from "@testing-library/vue";
 import Decimal from "../Decimal.vue";
-import Vue from "vue";
-import Vuetify from "vuetify";
-const vuetify = new Vuetify();
+import { describe, it, expect } from "vitest";
 
 describe("Decimal.vue", () => {
   function renderComponent({ value = "0", options = {} } = {}) {
-    const MockComponent = Vue.component("MockComponent", {
+    const MockComponent = {
       components: { Decimal },
       props: {
         label: String,
-        options: Object
+        options: Object,
       },
       data() {
         return {
-          value
+          value,
         };
       },
       template: `
@@ -22,17 +20,16 @@ describe("Decimal.vue", () => {
         v-model="value"
         :label="label"
         :options="options"
-        @input="$emit('input', $event)"
+        @update:modelValue="$emit('update:modelValue', $event)"
       />
-    `
-    });
+    `,
+    };
 
     return render(MockComponent, {
       props: {
         label: "Decimal",
-        options: { locale: "pt-BR", precision: 2, ...options }
+        options: { locale: "pt-BR", precision: 2, ...options },
       },
-      vuetify
     });
   }
 
@@ -65,7 +62,9 @@ describe("Decimal.vue", () => {
       await fireEvent.update(input, positiveInputValue);
 
       expect(findInput(component).value).toBe(positiveInputValue);
-      expect(component.emitted().input).toEqual([[positiveEmittedValue]]);
+      expect(component.emitted("update:modelValue")).toEqual([
+        [positiveEmittedValue],
+      ]);
     });
 
     describe("when type negative value", () => {
@@ -76,13 +75,15 @@ describe("Decimal.vue", () => {
         await fireEvent.update(input, negativeInputValue);
 
         expect(findInput(component).value).toBe(positiveInputValue);
-        expect(component.emitted().input).toEqual([[positiveEmittedValue]]);
+        expect(component.emitted("update:modelValue")).toEqual([
+          [positiveEmittedValue],
+        ]);
       });
 
       describe("when type negative symbol after clean input", () => {
         it("emits input event and renders new value", async () => {
           const component = renderComponent({
-            options: { allowNegative: true }
+            options: { allowNegative: true },
           });
           const input = findInput(component);
           await fireEvent.update(input, null);
@@ -90,27 +91,32 @@ describe("Decimal.vue", () => {
           await fireEvent.keyPress(input, { keyCode: 45 });
 
           expect(findInput(component).value).toBe("-0,00");
-          expect(component.emitted().input).toEqual([[undefined], ["-0.00"]]);
+          expect(component.emitted("update:modelValue")).toEqual([
+            [undefined],
+            ["-0.00"],
+          ]);
         });
       });
 
       describe("when allowNegative is true", () => {
         it("emits input event and renders new value", async () => {
           const component = renderComponent({
-            options: { allowNegative: true }
+            options: { allowNegative: true },
           });
           const input = findInput(component);
           await fireEvent.update(input, negativeInputValue);
 
           expect(findInput(component).value).toBe(negativeInputValue);
-          expect(component.emitted().input).toEqual([[negativeEmittedValue]]);
+          expect(component.emitted("update:modelValue")).toEqual([
+            [negativeEmittedValue],
+          ]);
         });
 
         describe("when type negative symbol with current value", () => {
           it("emits input event and renders new value", async () => {
             const component = renderComponent({
               value: "123456789",
-              options: { allowNegative: true }
+              options: { allowNegative: true },
             });
             const input = findInput(component);
             expect(findInput(component).value).toBe(positiveInputValue);
@@ -118,7 +124,9 @@ describe("Decimal.vue", () => {
             await fireEvent.keyPress(input, { keyCode: 45 });
 
             expect(findInput(component).value).toBe(negativeInputValue);
-            expect(component.emitted().input).toEqual([[negativeEmittedValue]]);
+            expect(component.emitted("update:modelValue")).toEqual([
+              [negativeEmittedValue],
+            ]);
           });
         });
       });

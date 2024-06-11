@@ -1,15 +1,15 @@
 <template>
   <div>
     <v-text-field-cnpj
-      v-model="value"
-      v-bind:label="label"
-      v-bind:properties="{
+      v-model="modelValue"
+      :label="label"
+      :properties="{
         disabled: false,
         outlined: true,
         clearable: true,
         placeholder: '',
       }"
-      v-bind:options="{
+      :options="{
         outputMask: '##############',
         empty: null,
         applyAfter: true,
@@ -17,13 +17,13 @@
     />
     v-model:
     {{
-      value !== null && value !== ""
-        ? value
-        : value === null
-        ? "null"
-        : value === ""
-        ? "''"
-        : ""
+      modelValue !== null && modelValue !== ""
+        ? modelValue
+        : modelValue === null
+          ? "null"
+          : modelValue === ""
+            ? "''"
+            : ""
     }}
   </div>
 </template>
@@ -36,7 +36,7 @@ export default {
     "v-text-field-cnpj": Cnpj,
   },
   data: () => ({
-    value: "50703512000192", // 123 or "123" or "" or null
+    modelValue: "50703512000192", // 123 or "123" or "" or null
     label: "CNPJ (Brazilian mask)",
   }),
 };
